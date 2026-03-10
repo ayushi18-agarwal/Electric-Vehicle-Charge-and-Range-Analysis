@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>EV Performance & Charging Analytics</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- CUSTOM CYBER-GRID THEME --- */
+        :root {
+            --background-dark: #060912;
+            --card-bg: rgba(15, 22, 36, 0.85);
+            --accent-cyan: #00f2ff;
+            --accent-green: #39ff14;
+            --text-main: #e0e6ed;
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            background-color: var(--background-dark);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        /* Animated Grid Background */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: 
+                linear-gradient(90deg, rgba(0, 242, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(rgba(0, 242, 255, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            z-index: -1;
+        }
+
+        /* Navbar */
+        .header {
+            background: rgba(6, 9, 18, 0.9);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 15px 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .sitename {
+            font-size: 1.5rem;
+            margin: 0;
+            background: linear-gradient(to right, var(--accent-cyan), var(--accent-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        .nav-link {
+            color: var(--text-main) !important;
+            margin-left: 20px;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+
+        .nav-link:hover {
+            color: var(--accent-cyan) !important;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 180px 0 80px 0;
+            text-align: center;
+            background: radial-gradient(circle at center, rgba(0, 242, 255, 0.1) 0%, transparent 70%);
+        }
+
+        .hero h2 {
+            font-size: clamp(2.2rem, 5vw, 3.8rem);
+            font-weight: 800;
+            margin-bottom: 20px;
+            text-shadow: 0 0 25px rgba(0, 242, 255, 0.4);
+        }
+
+        .hero-kicker {
+            color: var(--accent-green);
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        /* Section Titles */
+        .section-title h2 {
+            text-align: center;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+        }
+        
+        .section-title p {
+            text-align: center;
+            color: #8a96a3;
+            margin-bottom: 45px;
+        }
+
+        /* Visualization Containers */
+        .viz-card {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(12px);
+            margin-bottom: 60px;
+            overflow: hidden;
+        }
+
+        .overview-card {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 35px;
+            text-align: center;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            height: 100%;
+        }
+
+        .overview-card:hover {
+            transform: translateY(-12px);
+            border-color: var(--accent-cyan);
+            box-shadow: 0 15px 35px rgba(0, 242, 255, 0.2);
+        }
+
+        .overview-card i {
+            font-size: 3rem;
+            color: var(--accent-cyan);
+            margin-bottom: 20px;
+            display: block;
+            filter: drop-shadow(0 0 8px var(--accent-cyan));
+        }
+
+        .btn-custom {
+            background: transparent;
+            color: var(--accent-cyan);
+            border: 2px solid var(--accent-cyan);
+            padding: 14px 40px;
+            border-radius: 50px;
+            transition: 0.3s;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-block;
+            letter-spacing: 1px;
+        }
+
+        .btn-custom:hover {
+            background: var(--accent-cyan);
+            color: var(--background-dark);
+            box-shadow: 0 0 30px var(--accent-cyan);
+        }
+
+        section { padding: 90px 0; }
+        
+        @media (max-width: 768px) {
+            .hero { padding-top: 130px; }
+            .nav-link { margin-left: 10px; font-size: 0.9rem; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="header d-flex align-items-center">
+        <div class="container d-flex justify-content-between align-items-center">
+            <a href="#" class="sitename">EV_ANALYTICS</a>
+            <nav class="d-none d-md-flex">
+                <a href="#home" class="nav-link">Home</a>
+                <a href="#summary" class="nav-link">Metrics</a>
+                <a href="#dashboard" class="nav-link">Dashboard</a>
+                <a href="#story" class="nav-link">Story</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section id="home" class="hero">
+            <div class="container" data-aos="zoom-out">
+                <p class="hero-kicker">Data-Driven Mobility</p>
+                <h2>Electric Vehicle Charging & Performance Analysis</h2>
+                <p class="lead mb-4 text-secondary">Visualizing battery efficiency, charging speed, and long-range dynamics.</p>
+                <div class="d-flex justify-content-center gap-3">
+                    <a href="#dashboard" class="btn-custom">Go to Dashboard</a>
+                    <a href="#story" class="btn-custom" style="border-color: var(--accent-green); color: var(--accent-green);">View Data Story</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="summary">
+            <div class="container">
+                <div class="section-title" data-aos="fade-up">
+                    <h2>Performance Indicators</h2>
+                    <p>Core focus areas of our EV data exploration</p>
+                </div>
+                <div class="row g-4">
+                    <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+                        <div class="overview-card">
+                            <i class="bi bi-lightning-charge"></i>
+                            <h3>Charge Speed</h3>
+                            <p>Analyzing peak power delivery across modern charging infrastructure.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+                        <div class="overview-card">
+                            <i class="bi bi-battery-full"></i>
+                            <h3>Range Dynamics</h3>
+                            <p>Real-world range performance under varying load and battery conditions.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+                        <div class="overview-card">
+                            <i class="bi bi-ev-station"></i>
+                            <h3>Network Stats</h3>
+                            <p>Global trends in station availability and connector compatibility.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="dashboard">
+            <div class="container">
+                <div class="section-title" data-aos="fade-up">
+                    <h2>Interactive Dashboard</h2>
+                    <p>Live technical analysis of vehicle performance</p>
+                </div>
+                <div class="viz-card" data-aos="fade-up">
+                    <div class='tableauPlaceholder' id='viz1773128223567' style='position: relative'>
+                        <noscript>
+                            <a href='#'><img alt='Dashboard' src='https://public.tableau.com/static/images/El/ElectricVehiclePerformanceandcharginganalysis2/ElectricVehicleChargingPerformanceAnalyticsDashboard/1_rss.png' style='border: none' /></a>
+                        </noscript>
+                        <object class='tableauViz' style='display:none;'>
+                            <param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> 
+                            <param name='embed_code_version' value='3' /> 
+                            <param name='site_root' value='' />
+                            <param name='name' value='ElectricVehiclePerformanceandcharginganalysis2/ElectricVehicleChargingPerformanceAnalyticsDashboard' />
+                            <param name='tabs' value='no' />
+                            <param name='toolbar' value='yes' />
+                            <param name='static_image' value='https://public.tableau.com/static/images/El/ElectricVehiclePerformanceandcharginganalysis2/ElectricVehicleChargingPerformanceAnalyticsDashboard/1.png' /> 
+                            <param name='animate_transition' value='yes' />
+                            <param name='display_static_image' value='yes' />
+                            <param name='display_spinner' value='yes' />
+                            <param name='display_overlay' value='yes' />
+                            <param name='display_count' value='yes' />
+                            <param name='language' value='en-US' />
+                            <param name='filter' value='publish=yes' />
+                        </object>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="story">
+            <div class="container">
+                <div class="section-title" data-aos="fade-up">
+                    <h2>Data Journey: Story 1</h2>
+                    <p>A narrative exploration of electric mobility trends</p>
+                </div>
+                <div class="viz-card" data-aos="fade-up">
+                    <div class='tableauPlaceholder' id='viz1773129868111' style='position: relative'>
+                        <noscript>
+                            <a href='#'><img alt='Story' src='https://public.tableau.com/static/images/El/ElectricVehiclePerformanceandcharginganalysis2/Story1/1_rss.png' style='border: none' /></a>
+                        </noscript>
+                        <object class='tableauViz' style='display:none;'>
+                            <param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> 
+                            <param name='embed_code_version' value='3' /> 
+                            <param name='site_root' value='' />
+                            <param name='name' value='ElectricVehiclePerformanceandcharginganalysis2/Story1' />
+                            <param name='tabs' value='no' />
+                            <param name='toolbar' value='yes' />
+                            <param name='static_image' value='https://public.tableau.com/static/images/El/ElectricVehiclePerformanceandcharginganalysis2/Story1/1.png' /> 
+                            <param name='animate_transition' value='yes' />
+                            <param name='display_static_image' value='yes' />
+                            <param name='display_spinner' value='yes' />
+                            <param name='display_overlay' value='yes' />
+                            <param name='display_count' value='yes' />
+                            <param name='language' value='en-US' />
+                            <param name='filter' value='publish=yes' />
+                        </object>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="pb-5">
+            <div class="container">
+                <div class="overview-card p-5" data-aos="zoom-in" style="background: rgba(0, 242, 255, 0.05);">
+                    <h3>Project Conclusion</h3>
+                    <p class="text-secondary mb-0">This comprehensive study highlights the rapid advancement in charging efficiency and range stability. By leveraging visual analytics, we can better understand the transition toward a sustainable transportation future.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        // Initialize Scroll Animations
+        AOS.init({ duration: 1000, once: true });
+
+        // Combined Tableau Loader for both Dashboard and Story
+        function initTableauVisuals() {
+            // IDs of both placeholders
+            const dashId = 'viz1773128223567';
+            const storyId = 'viz1773129868111';
+
+            function resizeViz(containerId, isStory = false) {
+                const container = document.getElementById(containerId);
+                const viz = container.getElementsByTagName('object')[0];
+                const width = container.offsetWidth;
+
+                if (width > 800) {
+                    viz.style.width = '100%';
+                    viz.style.height = isStory ? '991px' : '927px';
+                } else if (width > 500) {
+                    viz.style.width = '100%';
+                    viz.style.height = isStory ? '800px' : '927px';
+                } else {
+                    viz.style.width = '100%';
+                    viz.style.height = isStory ? '700px' : '1600px';
+                }
+            }
+
+            // Apply sizing
+            resizeViz(dashId, false);
+            resizeViz(storyId, true);
+
+            // Load Tableau Script only once
+            var scriptElement = document.createElement('script');
+            scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';
+            document.body.appendChild(scriptElement);
+
+            // Handle browser resize
+            window.addEventListener('resize', () => {
+                resizeViz(dashId, false);
+                resizeViz(storyId, true);
+            });
+        }
+
+        window.addEventListener("load", initTableauVisuals);
+        
+        // Smooth scrolling for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
